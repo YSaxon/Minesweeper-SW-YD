@@ -1,0 +1,39 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".MainActivity">
+    <item
+        android:id="@+id/action_newGame"
+        android:icon="@drawable/ic_launch_white_24dp"
+        android:title="@string/action_newGame"
+        app:showAsAction="ifRoom|withText" />
+
+    <item
+        android:id="@+id/action_newBeginnerGame"
+        android:title="@string/action_newBeginnerGame"
+        android:checkable="false"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/action_newIntermediateGame"
+        android:title="@string/action_newIntermediateGame"
+        android:checkable="false"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/action_newExpertGame"
+        android:title="@string/action_newExpertGame"
+        android:checkable="false"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/action_autoSave"
+        android:checkable="true"
+        android:checked="false"
+        android:title="@string/action_autoSaveGame"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/action_about"
+        android:icon="@drawable/ic_info_white_24dp"
+        android:title="@string/about"
+        app:showAsAction="never" />
+</menu>

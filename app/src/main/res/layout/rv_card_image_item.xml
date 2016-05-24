@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_margin="1dp"
+    android:background="@color/primary"
+    style="@style/Base.Widget.AppCompat.ButtonBar"
+    android:gravity="center">
+
+    <ToggleButton
+        android:id="@+id/rv_image_item"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:contentDescription="@string/board_space"
+        android:minHeight="24dp"
+        android:minWidth="24dp"
+        android:textOff=""
+        android:textColor="@android:color/white"
+        android:textSize="@dimen/buttonTextSize" />
+</LinearLayout>

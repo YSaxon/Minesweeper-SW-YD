@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="outside_margin">4dp</dimen>
+    <dimen name="fontSizeStatusBar">18sp</dimen>
+    <dimen name="buttonTextSize">2sp</dimen>
+</resources>
