@@ -543,7 +543,6 @@ public class MainActivity extends AppCompatActivity {
                 // if bomb then set drawable to bomb
                 // This sets clicked button to bomb
                 t.setBackgroundDrawable(getResources().getDrawable(R.drawable.minesweeper_bomb))*/
-                ;
 
                 Random random = new Random();
                 int number = random.nextInt(6);
@@ -568,21 +567,6 @@ public class MainActivity extends AppCompatActivity {
         mSwipeRefreshLayout.setRefreshing(true);
         prepareForNewGame();
         startNewOrResumeGameState();
-    }
-
-    /**
-     * Switches changes the board's space icon in that space to match the X or O
-     * and updates the current and recent positions to match the just-chosen space
-     *
-     * @param position The position on the board to change to X or O
-     */
-    private void doPlayerTurn(final int position) {
-        updateMemberPositions(position);
-    }
-
-    private void updateMemberPositions(int position) {
-        mPriorPosition = mCurrentPosition;
-        mCurrentPosition = position;
     }
 
     private void doGameOverTasks() {
