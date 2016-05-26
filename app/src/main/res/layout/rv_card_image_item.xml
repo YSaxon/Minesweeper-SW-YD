@@ -16,6 +16,7 @@
         android:contentDescription="@string/board_space"
         android:minHeight="24dp"
         android:minWidth="24dp"
+        android:textOn="X"
         android:textOff=""
         android:textColor="@android:color/white"
         android:textSize="@dimen/buttonTextSize" />

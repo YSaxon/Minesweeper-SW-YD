@@ -31,7 +31,24 @@ public class MainActivity extends AppCompatActivity {
     private final int INTERMEDIATE_BOARD_SPACES = 256;
     private final int EXPERT_BOARD_SPACES = 400;
 
+    private final int BEGINNER_BOARD_X = 10;
+    private final int BEGINNER_BOARD_Y = 30;
+
+    private final int INTERMEDIATE_BOARD_X = 30;
+    private final int INTERMEDIATE_BOARD_Y = 10;
+
+    private final int EXPERT_BOARD_X = 10;
+    private final int EXPERT_BOARD_Y = 10;
+
+
+    private final int BEGINNER_BOMB_PCT = 15;
+    private final int INTERMEDIATE_BOMB_PCT = 16;
+    private final int EXPERT_BOMB_PCT = 19;
+
     private int getPreferedLevel = INTERMEDIATE_BOARD_SPACES;
+    private int getPreferedLevelX = INTERMEDIATE_BOARD_X;
+    private int getPreferedLevelY = INTERMEDIATE_BOARD_Y;
+    private int getPreferedPCT = INTERMEDIATE_BOMB_PCT;
 
     private final double BEGINNER_SCALE_P = 13.5;
     private final double INTERMEDIATE_SCALE_P = 22;
@@ -41,14 +58,14 @@ public class MainActivity extends AppCompatActivity {
     private final double INTERMEDIATE_SCALE_L = 20;
     private final double EXPERT_SCALE_L = 6;
 
+
+
     private double getPreferedScale = INTERMEDIATE_SCALE_P;
 
-    private final int BEGINNER_BOMB_COUNT = 15;
-    private final int INTERMEDIATE_BOMB_COUNT = 40;
-    private final int EXPERT_BOMB_COUNT = 75;
+    //private final int
 
     private boolean mBombDetonated;
-    private int totalBombs = INTERMEDIATE_BOMB_COUNT;
+    //private int totalBombs = INTERMEDIATE_BOMB_COUNT;
 
     private boolean mPrefUseAutoSave, mGameOver;
     private int mCurrentPosition, mPriorPosition = mINVALID_ICON_VALUE_FLAG;
@@ -58,6 +75,7 @@ public class MainActivity extends AppCompatActivity {
     private final String mKEY_BOARD = "BOARD";
     private final String mKEY_GAME_OVER = "GAME_OVER";
     private final String mPREFS = "PREFS";
+
 
 
     private CardViewImageAdapter mAdapter;
@@ -76,6 +94,12 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         initGUI();
+
+        if (savedInstanceState!=null){
+            getPreferedLevelX = savedInstanceState.getInt("rows");
+            getPreferedLevelY = savedInstanceState.getInt("cols");
+            getPreferedScale = savedInstanceState.getDouble("SCALEP");
+        }
 
         createUnfilledBoard();
 
@@ -139,10 +163,10 @@ public class MainActivity extends AppCompatActivity {
     private void createUnfilledBoard() {
 
         // Create the adapter for later use in the RecyclerView
-        mAdapter = new CardViewImageAdapter(getApplicationContext(), getPreferedLevel, R.drawable.empty, getPreferedScale);
+        mAdapter = new CardViewImageAdapter(getApplicationContext(), getPreferedLevelX, getPreferedLevelY,getPreferedPCT,R.drawable.empty, getPreferedScale);
 
         // set the listener which will listen to the clicks in the RecyclerView
-        mAdapter.setOnItemClickAndLongClickListener(listener);
+        //mAdapter.setOnItemClickAndLongClickListener(listener);
 
 
         // get a reference to the RecyclerView
@@ -150,7 +174,7 @@ public class MainActivity extends AppCompatActivity {
         assert board != null;
 
         // get a reference to a new LayoutManager for the RecyclerView
-        RecyclerView.LayoutManager layoutManager = new GridLayoutManager(this, (int) Math.sqrt(getPreferedLevel));
+        RecyclerView.LayoutManager layoutManager = new GridLayoutManager(this, getPreferedLevelY);//this is where we should tell it how many columsn we have
         layoutManager.setAutoMeasureEnabled(true);
 
 
@@ -185,7 +209,7 @@ public class MainActivity extends AppCompatActivity {
     private void setupInitialSession() {
         setDefaultValuesForPreferences();
         prepareForNewGame();
-        restoreAllDataFromPrefs();
+        //restoreAllDataFromPrefs();
         startNewOrResumeGameState();
     }
 
@@ -242,9 +266,14 @@ public class MainActivity extends AppCompatActivity {
         // save the current autoSave boolean
         outState.putBoolean(mKEY_USE_AUTO_SAVE, mPrefUseAutoSave);
 
+        outState.putDouble("SCALEP",getPreferedScale);
+        /*
         // save the board layout as a whole to the bundle to be saved
         outState.putIntArray(mKEY_BOARD, mAdapter.getDataOfModel());
         outState.putCharArray(mKEY_BOARD_CHARS, mAdapter.getSecondaryDataOfModel());
+        */
+
+        outState.putAll(mAdapter.getCardViewDataSerialized());
     }
 
     /**
@@ -264,41 +293,14 @@ public class MainActivity extends AppCompatActivity {
         // restore game over
         mGameOver = savedInstanceState.getBoolean(mKEY_GAME_OVER);
 
-        // restore the game board one space at a time
-        restoreBoardFromSavedState(savedInstanceState);
+        // have mAdapter restore its old state
+        mAdapter.restoreSerializedData(savedInstanceState);
 
         // show game over message if the current saved game had already ended
         showGameOverSnackBarIfGameOver();
     }
 
-    private void restoreBoardFromSavedState(Bundle savedInstanceState) {
-        restoreBoardImageData(savedInstanceState);
-        restoreBoardCharData(savedInstanceState);
-    }
 
-    private void restoreBoardCharData(Bundle savedInstanceState) {
-        // This is essentially a copy of the board as it was before the rotation, etc.
-        char[] existingBoard = savedInstanceState.getCharArray(mKEY_BOARD_CHARS);
-
-        if (existingBoard != null) {
-            for (int i = 0; i < existingBoard.length; i++) {
-                // since the Adapter's array is private, call the public setImage for each image
-                mAdapter.setChar(i, existingBoard[i]);
-            }
-        }
-    }
-
-    private void restoreBoardImageData(Bundle savedInstanceState) {
-        // This is essentially a copy of the board as it was before the rotation, etc.
-        int[] existingBoard = savedInstanceState.getIntArray(mKEY_BOARD);
-
-        if (existingBoard != null) {
-            for (int i = 0; i < existingBoard.length; i++) {
-                // since the Adapter's array is private, call the public setImage for each image
-                mAdapter.setImage(i, existingBoard[i]);
-            }
-        }
-    }
 
     private void showGameOverSnackBarIfGameOver() {
         if (mGameOver) {
@@ -329,7 +331,7 @@ public class MainActivity extends AppCompatActivity {
         editor.putBoolean(mKEY_USE_AUTO_SAVE, mPrefUseAutoSave);
 
         // if autoSave is on then save the board
-        saveBoardToSharedPrefsIfAutoSaveIsOn(editor);
+        //saveBoardToSharedPrefsIfAutoSaveIsOn(editor);
 
         // apply the changes to the XML file in the device's storage
         editor.apply();
@@ -391,16 +393,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void restoreBoard(SharedPreferences preferences) {
-        String currentKeyName;
-        int currentSpace;
-
-        // restore the board one square at a time
-        for (int i = 0; i < mAdapter.getItemCount(); i++) {
-            currentKeyName = mKEY_BOARD + i;
-            currentSpace = (int) preferences.getLong(currentKeyName, mEMPTY_SPACE);
-            currentSpace = getValidCurrentSpace(currentSpace);
-            mAdapter.setImage(i, currentSpace);
-        }
+        throw new RuntimeException("shouldnt be using right now");
+//        String currentKeyName;
+//        int currentSpace;
+//
+//        // restore the board one square at a time
+//        for (int i = 0; i < mAdapter.getItemCount(); i++) {
+//            currentKeyName = mKEY_BOARD + i;
+//            currentSpace = (int) preferences.getLong(currentKeyName, mEMPTY_SPACE);
+//            currentSpace = getValidCurrentSpace(currentSpace);
+//            mAdapter.setImage(i, currentSpace);
+//        }
     }
 
     private int getValidCurrentSpace(int currentSpace) {
@@ -452,17 +455,17 @@ public class MainActivity extends AppCompatActivity {
             }
 
             case R.id.action_newBeginnerGame: {
-                createNewGame(BEGINNER_BOARD_SPACES, BEGINNER_SCALE_P, BEGINNER_SCALE_L, BEGINNER_BOMB_COUNT);
+                createNewGame(BEGINNER_BOARD_X,BEGINNER_BOARD_Y, BEGINNER_SCALE_P, BEGINNER_SCALE_L, BEGINNER_BOMB_PCT);//still needs to be adapted
                 return true;
             }
 
             case R.id.action_newIntermediateGame: {
-                createNewGame(INTERMEDIATE_BOARD_SPACES, INTERMEDIATE_SCALE_P, INTERMEDIATE_SCALE_L, INTERMEDIATE_BOMB_COUNT);
+                createNewGame(INTERMEDIATE_BOARD_X,INTERMEDIATE_BOARD_Y, INTERMEDIATE_SCALE_P, INTERMEDIATE_SCALE_L, INTERMEDIATE_BOMB_PCT);
                 return true;
             }
 
             case R.id.action_newExpertGame: {
-                createNewGame(EXPERT_BOARD_SPACES, EXPERT_SCALE_P, EXPERT_SCALE_L, EXPERT_BOMB_COUNT);
+                createNewGame(EXPERT_BOARD_X,EXPERT_BOARD_Y, EXPERT_SCALE_P, EXPERT_SCALE_L, EXPERT_BOMB_PCT);
                 return true;
             }
 
@@ -481,15 +484,16 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void createNewGame(int boardSpaces, double scaleP, double scaleL, int bombCount) {
-        getPreferedLevel = boardSpaces;
+    private void createNewGame(int boardX, int boardY, double scaleP, double scaleL, int bombPCT) {//still needs to be adapted
+        getPreferedLevelX = boardX;
+        getPreferedLevelY = boardY;
         getPreferedScale = getResources().getConfiguration().orientation
                 == Configuration.ORIENTATION_PORTRAIT
                 ? scaleP
                 : scaleL;
-        Log.d("SCALING", "The scale is " + getPreferedScale);
+        Log.d("SCALING", "The dimens are " + getPreferedLevelX + ","+ getPreferedLevelY);
         Log.d("SCALING", "The orientation is " + ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        totalBombs = bombCount;
+        //totalBombs = bombPCT;
         startNewGameIncludingSRAnimation();
     }
 
@@ -501,66 +505,66 @@ public class MainActivity extends AppCompatActivity {
     // This private anonymous inner-class listener is registered to the RecyclerView.
     // ---------------------------------------------------------------------------------------------
 
-    private final CardViewImageAdapter.OIClickAndLongClickListener
-            listener = new CardViewImageAdapter.OIClickAndLongClickListener() {
-
-        @Override
-        public void onItemLongClick(int position, View v) {
-            // if the game is already over then there is nothing more to do here
-            if (mGameOver) {
-                showGameOverSB(true);
-            } else {
-                /*ToggleButton t = (ToggleButton) v;
-                Log.d("TOGGLE", t.getTextOff().toString());
-
-                // If someone long clicks: a flag should appear and bomb count should go down 1.
-                if (t.isClickable()) {
-                    t.setClickable(false);
-                    t.setText("F");
-                    totalBombs--;
-                }
-                // If someone long clicks a flag: flag should disappear and bomb count should go up 1.
-                else {
-                    t.setClickable(true);
-                    t.setText("");
-                    totalBombs++;
-                }*/
-                mAdapter.setChar(position, 'F');
-
-            }
-            Log.d("LONG_CLICK", "Long Click");
-        }
-
-        public void onItemClick(int position, View v) {
-            // if the game is already over then there is nothing more to do here
-            if (mGameOver) {
-                showGameOverSB(true);
-            } else {
-               /* ToggleButton t = (ToggleButton) v;
-                Log.d("TOGGLE", t.getTextOff().toString());
-                t.setEnabled(false);
-
-                // if bomb then set drawable to bomb
-                // This sets clicked button to bomb
-                t.setBackgroundDrawable(getResources().getDrawable(R.drawable.minesweeper_bomb))*/
-
-                Random random = new Random();
-                int number = random.nextInt(6);
-
-                if (number % 2 == 0) {
-                    mAdapter.setImage(position, R.drawable.minesweeper_bomb);
-                } else {
-                    mAdapter.setChar(position, (char)(number + '1'));
-                    Log.d("CLICK", "Number should be char value of "
-                            + (number + 1) + " which is " + (char)(number + '1'));
-                }
-                //else set text to whatever number should be
-                //t.setText("1");
-
-            }
-            Log.d("LONG_CLICK", "Click");
-        }
-    };
+//    private final CardViewImageAdapter.OIClickAndLongClickListener
+//            listener = new CardViewImageAdapter.OIClickAndLongClickListener() {
+//
+//        @Override
+//        public void onItemLongClick(int position, View v) {
+//            // if the game is already over then there is nothing more to do here
+//            if (mGameOver) {
+//                showGameOverSB(true);
+//            } else {
+//                /*ToggleButton t = (ToggleButton) v;
+//                Log.d("TOGGLE", t.getTextOff().toString());
+//
+//                // If someone long clicks: a flag should appear and bomb count should go down 1.
+//                if (t.isClickable()) {
+//                    t.setClickable(false);
+//                    t.setText("F");
+//                    totalBombs--;
+//                }
+//                // If someone long clicks a flag: flag should disappear and bomb count should go up 1.
+//                else {
+//                    t.setClickable(true);
+//                    t.setText("");
+//                    totalBombs++;
+//                }*/
+//                mAdapter.setChar(position, 'F');
+//
+//            }
+//            Log.d("LONG_CLICK", "Long Click");
+//        }
+//
+//        public void onItemClick(int position, View v) {
+//            // if the game is already over then there is nothing more to do here
+//            if (mGameOver) {
+//                showGameOverSB(true);
+//            } else {
+//               /* ToggleButton t = (ToggleButton) v;
+//                Log.d("TOGGLE", t.getTextOff().toString());
+//                t.setEnabled(false);
+//
+//                // if bomb then set drawable to bomb
+//                // This sets clicked button to bomb
+//                t.setBackgroundDrawable(getResources().getDrawable(R.drawable.minesweeper_bomb))*/
+//
+//                Random random = new Random();
+//                int number = random.nextInt(6);
+//
+//                if (number % 2 == 0) {
+//                    mAdapter.setImage(position, R.drawable.minesweeper_bomb);
+//                } else {
+//                    mAdapter.setChar(position, (char)(number + '1'));
+//                    Log.d("CLICK", "Number should be char value of "
+//                            + (number + 1) + " which is " + (char)(number + '1'));
+//                }
+//                //else set text to whatever number should be
+//                //t.setText("1");
+//
+//            }
+//            Log.d("LONG_CLICK", "Click");
+//        }
+//    };
 
     private void startNewGameIncludingSRAnimation() {
         // start animation
