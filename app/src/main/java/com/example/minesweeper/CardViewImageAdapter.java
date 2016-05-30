@@ -12,10 +12,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageView;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Random;
 
@@ -307,7 +305,7 @@ public class CardViewImageAdapter extends RecyclerView.Adapter<CardViewImageAdap
         void onItemLongClick (int position, View v){
             int x=xFromPos(position);
             int y=yFromPos(position);
-            if (!mIsRevealed[x][y]){toggleFlag(x,y);}
+            if (!mIsRevealed[x][y]==true){toggleFlag(x,y);}
             else if (longClickOnRevealedRevealsNeighbors) {revealNeighbors(x,y);}//possibly make a setting to control this
         }
 
@@ -325,7 +323,7 @@ public class CardViewImageAdapter extends RecyclerView.Adapter<CardViewImageAdap
         if(!mIsRevealed[x][y]&&!mIsFlagged[x][y]){
         System.out.println("reveal called for: "+x+","+y+"  >  "+mMinesSurrounding[x][y]+" around    ;  revealed "+mIsRevealed[x][y]);
         mIsRevealed[x][y]=true;
-        if(mIsMine[x][y]){explode(x,y);}
+        if(mIsMine[x][y]==true){explode(x,y);}
         else setChar(x,y, Integer.toString(mMinesSurrounding[x][y]).charAt(0));
 
         if (mMinesSurrounding[x][y]==0){
@@ -337,7 +335,7 @@ public class CardViewImageAdapter extends RecyclerView.Adapter<CardViewImageAdap
     private void revealNeighbors(int x, int y) {
         ArrayList<int[]> neighbors=getNeighbors(x,y);
        for(int[] pair:neighbors)
-            if (!mIsRevealed[pair[0]][pair[1]]){ reveal(pair[0],pair[1]);};
+            if (!(mIsRevealed[pair[0]][pair[1]])==true){ reveal(pair[0],pair[1]);};
         }
 
 
@@ -395,27 +393,34 @@ public class CardViewImageAdapter extends RecyclerView.Adapter<CardViewImageAdap
         allInOne.putInt("rows",rows);
         allInOne.putInt("cols",cols);
 
-        allInOne.putSerializable("mines",mIsMine);
-        allInOne.putSerializable("flags",mIsFlagged);
-        allInOne.putSerializable("revealed",mIsRevealed);
+        allInOne.putSerializable("boolean>mines",mIsMine);
+        allInOne.putSerializable("boolean>flags",mIsFlagged);
+        allInOne.putSerializable("boolean>revealed",mIsRevealed);
 
         //less important stuff that could just be regenerated
-        allInOne.putSerializable("numSurround",mMinesSurrounding);
-        allInOne.putSerializable("images",mImages);
-        allInOne.putSerializable("chars",mChars);
+        allInOne.putSerializable("int>numSurround",mMinesSurrounding);
+        allInOne.putSerializable("int>images",mImages);
+        allInOne.putSerializable("char>chars",mChars);
         return allInOne;
     }
     public void restoreSerializedData(Bundle savedInstanceState) {
         rows=savedInstanceState.getInt("rows");
         cols=savedInstanceState.getInt("cols");
 
-        mIsMine = (boolean[][]) savedInstanceState.getSerializable("mines");
-        mIsFlagged = (boolean[][]) savedInstanceState.getSerializable("flags");
-        mIsRevealed = (boolean[][]) savedInstanceState.getSerializable("revealed");
 
-        mMinesSurrounding= (int[][]) savedInstanceState.getSerializable("numSurround");
-        mImages= (int[][]) savedInstanceState.getSerializable("images");
-        mChars= (char[][]) savedInstanceState.getSerializable("chars");
+
+
+
+
+
+
+        mIsMine = (boolean[][]) savedInstanceState.getSerializable("boolean>mines");
+        mIsFlagged = (boolean[][]) savedInstanceState.getSerializable("boolean>flags");
+        mIsRevealed = (boolean[][]) savedInstanceState.getSerializable("boolean>revealed");
+
+        mMinesSurrounding= (int[][]) savedInstanceState.getSerializable("int>numSurround");
+        mImages= (int[][]) savedInstanceState.getSerializable("int>images");
+        mChars= (char[][]) savedInstanceState.getSerializable("char>chars");
 
         notifyDataSetChanged();
     }

@@ -20,8 +20,22 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import org.apache.commons.lang3.StringUtils;
+import org.json.JSONArray;
+import org.json.JSONException;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
+import java.io.Serializable;
+import java.lang.reflect.Array;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -91,10 +105,20 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+
+        initializePreferences();
+
         setContentView(R.layout.activity_main);
 
         initGUI();
 
+        Boolean dataFromAutoSave=false;
+        if(savedInstanceState==null){
+            Bundle prefData=restoreAllDataFromPrefs();
+            if(prefData!=null && prefData.containsKey("boolean>mines")){//test for a sample of data in prefs that would be there if was autosaved
+                savedInstanceState=prefData;
+                dataFromAutoSave=true;
+            }}
         if (savedInstanceState!=null){
             getPreferedLevelX = savedInstanceState.getInt("rows");
             getPreferedLevelY = savedInstanceState.getInt("cols");
@@ -105,14 +129,17 @@ public class MainActivity extends AppCompatActivity {
 
         initializeSnackBar();
 
-        initializePreferences();
+
 
         // If we are starting a fresh Activity (meaning, not after rotation), then do initial setup
         if (savedInstanceState == null) {
             setupInitialSession();
         }
         // If we're in the middle of a game then onRestoreInstanceState will restore the App's state
-
+        if(dataFromAutoSave){
+            onRestoreInstanceState(savedInstanceState);
+            //mAdapter.restoreSerializedData(savedInstanceState);
+        }
     }
 
     private void initializePreferences() {
@@ -209,13 +236,13 @@ public class MainActivity extends AppCompatActivity {
     private void setupInitialSession() {
         setDefaultValuesForPreferences();
         prepareForNewGame();
-        //restoreAllDataFromPrefs();
+        //restoreAllDataFromPrefs(); now at the top of oncreate
         startNewOrResumeGameState();
     }
 
-    private void restoreAllDataFromPrefs() {
+    private Bundle restoreAllDataFromPrefs() {
         restoreGameTypeAndAutoSaveStatus();
-        restoreLastStateIfAutoSaveIsOn();
+        return restoreLastStateIfAutoSaveIsOn();
     }
 
     /**
@@ -227,26 +254,33 @@ public class MainActivity extends AppCompatActivity {
 
         // restore AutoSave preference value
         mPrefUseAutoSave = preferences.getBoolean(mKEY_USE_AUTO_SAVE, true);
+        System.out.println("autosave = " + mPrefUseAutoSave);
     }
 
-    private void restoreLastStateIfAutoSaveIsOn() {
+    private Bundle restoreLastStateIfAutoSaveIsOn() {
         SharedPreferences preferences = getSharedPreferences(mPREFS, MODE_PRIVATE);
 
-        if (mPrefUseAutoSave) {
+         if (mPrefUseAutoSave) {
 
-            // restore "game-over" state
-            mGameOver = preferences.getBoolean(mKEY_GAME_OVER, false);
+        // restore "game-over" state
+        mGameOver = preferences.getBoolean(mKEY_GAME_OVER, false);
 
-            restoreAllBoardData(preferences);
+        return restoreAllBoardData(preferences);
         }
+        return null;//if not autosave
     }
 
-    private void restoreAllBoardData(SharedPreferences preferences) {
+    private Bundle restoreAllBoardData(SharedPreferences preferences) {
         // restore the board icon values from SharedPreferences
-        restoreBoardIcons(preferences);
+        //restoreBoardIcons(preferences);
 
         // restore the board from SharedPreferences
-        restoreBoard(preferences);
+        //restoreBoard(preferences);
+
+        return loadPreferencesBundle(preferences,"bundle");
+
+
+
     }
 
     /**
@@ -329,9 +363,11 @@ public class MainActivity extends AppCompatActivity {
 
         // save autoSave preference
         editor.putBoolean(mKEY_USE_AUTO_SAVE, mPrefUseAutoSave);
+        System.out.println("spabtsp autosave = " + mPrefUseAutoSave);
+
 
         // if autoSave is on then save the board
-        //saveBoardToSharedPrefsIfAutoSaveIsOn(editor);
+        saveBoardToSharedPrefsIfAutoSaveIsOn(editor);
 
         // apply the changes to the XML file in the device's storage
         editor.apply();
@@ -340,6 +376,9 @@ public class MainActivity extends AppCompatActivity {
 
     private void saveBoardToSharedPrefsIfAutoSaveIsOn(SharedPreferences.Editor editor) {
         // (Only) if autoSave is enabled, then save the board and current player to the SP file
+        System.out.println("MainActivity.saveBoardToSharedPrefsIfAutoSaveIsOn");
+        System.out.println("autosave = " + mPrefUseAutoSave);
+        //System.out.println("");
         if (mPrefUseAutoSave) {
 
             // save "game over" state
@@ -350,11 +389,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void saveAllBoardData(SharedPreferences.Editor editor) {
+
+
+        Bundle bundle = new Bundle();
+        onSaveInstanceState(bundle);
+        savePreferencesBundle(editor,"bundle",bundle);
+        editor.commit();
+        //Bundle mbundle= mAdapter.getCardViewDataSerialized();
+        //savePreferencesBundle(editor,"bundle2",mbundle);
         // save the board icon IDs to SharedPreferences
-        saveBoardIcons(editor);
+        //saveBoardIcons(editor);
 
         // save the board to SharedPreferences
-        saveBoard(editor);
+        //saveBoard(editor);
 
         // save the tints to SharedPreferences (if gameOver)
 //        saveTints(editor);
@@ -687,4 +734,145 @@ public class MainActivity extends AppCompatActivity {
             return super.onKeyUp(keyCode, event);
         }
     }
+
+
+
+    private static final String SAVED_PREFS_BUNDLE_KEY_SEPARATOR = "§§";
+
+    /**
+     * Save a Bundle object to SharedPreferences.
+     *
+     * NOTE: The editor must be writable, and this function does not commit.
+     *
+     * @param editor SharedPreferences Editor
+     * @param key SharedPreferences key under which to store the bundle data. Note this key must
+     *            not contain '§§' as it's used as a delimiter
+     * @param preferences Bundled preferences
+     */
+    public static void savePreferencesBundle(SharedPreferences.Editor editor, String key, Bundle preferences) {
+        Set<String> keySet = preferences.keySet();
+        Iterator<String> it = keySet.iterator();
+        String prefKeyPrefix = key + SAVED_PREFS_BUNDLE_KEY_SEPARATOR;
+
+        while (it.hasNext()){
+            String bundleKey = it.next();
+            Object o = preferences.get(bundleKey);
+            if (o == null){
+                editor.remove(prefKeyPrefix + bundleKey);
+            } else if (o instanceof Integer){
+                editor.putInt(prefKeyPrefix + bundleKey, (Integer) o);
+            } else if (o instanceof Long){
+                editor.putLong(prefKeyPrefix + bundleKey, (Long) o);
+            } else if (o instanceof Double){
+                editor.putLong(prefKeyPrefix + bundleKey, ((Double) o).longValue());
+            } else if (o instanceof Boolean){
+                editor.putBoolean(prefKeyPrefix + bundleKey, (Boolean) o);
+            } else if (o instanceof CharSequence){
+                editor.putString(prefKeyPrefix + bundleKey, ((CharSequence) o).toString());
+            } else if (o instanceof Bundle){
+                savePreferencesBundle(editor, prefKeyPrefix + bundleKey, ((Bundle) o));
+            } else if (o instanceof Object[] || o.getClass().isArray()){
+                Gson gson = new Gson();
+                String string = gson.toJson(o);
+                editor.putString(prefKeyPrefix + bundleKey,string);
+//                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+//                    try {
+//                        JSONArray json = new JSONArray(o);
+//                        String string = json.toString();
+//                        editor.putString(prefKeyPrefix + bundleKey,string);
+//                    } catch (JSONException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+            }
+        }
+    }
+
+    private static int[] toArray(String json, Gson parser) {
+        return parser.fromJson(json, int[].class);
+    }
+    /**
+     * Load a Bundle object from SharedPreferences.
+     * (that was previously stored using savePreferencesBundle())
+     *
+     * NOTE: The editor must be writable, and this function does not commit.
+     *
+     * @param sharedPreferences SharedPreferences
+     * @param key SharedPreferences key under which to store the bundle data. Note this key must
+     *            not contain '§§' as it's used as a delimiter
+     *
+     * @return bundle loaded from SharedPreferences
+     */
+    public static Bundle loadPreferencesBundle(SharedPreferences sharedPreferences, String key) {
+        Bundle bundle = new Bundle();
+        Map<String, ?> all = sharedPreferences.getAll();
+        Iterator<String> it = all.keySet().iterator();
+        String prefKeyPrefix = key + SAVED_PREFS_BUNDLE_KEY_SEPARATOR;
+        Set<String> subBundleKeys = new HashSet<String>();
+        boolean wasDataThere = false;
+        while (it.hasNext()) {
+            wasDataThere=true;
+            String prefKey = it.next();
+
+            if (prefKey.startsWith(prefKeyPrefix)) {
+                String bundleKey = StringUtils.removeStart(prefKey, prefKeyPrefix);
+
+                if (!bundleKey.contains(SAVED_PREFS_BUNDLE_KEY_SEPARATOR)) {
+
+                    Object o = all.get(prefKey);
+                    if (o == null) {
+                        // Ignore null keys
+                    } else if (o instanceof Integer) {
+                        bundle.putInt(bundleKey, (Integer) o);
+                    } else if (o instanceof Long) {
+                        bundle.putLong(bundleKey, (Long) o);
+                    } else if (o instanceof Boolean) {
+                        bundle.putBoolean(bundleKey, (Boolean) o);
+                    } else if (o instanceof CharSequence) {
+
+                        Gson gson = new Gson();
+                        Type type = null;
+
+                        if (bundleKey.startsWith("int>")){
+                            type = new TypeToken<int[][]>() {}.getType();}
+                        else if (bundleKey.startsWith("boolean>")){
+                            type = new TypeToken<boolean[][]>() {}.getType();}
+                        else if (bundleKey.startsWith("char>")){
+                            type = new TypeToken<char[][]>() {}.getType();}
+//                        else if (bundleKey.startsWith("string>")){
+//                            type = new TypeToken<ArrayList<String>>() {}.getType();}*/
+//                        else if (bundleKey.contains(">")) {
+//                            type = new TypeToken<Object[][]>() {}.getType();
+//                        }
+
+                        if (type != null){//if was an array
+                            Object serializable = gson.fromJson((String) o, type);
+                            bundle.putSerializable(bundleKey, (Serializable) serializable);}
+                        else{//actually a string
+                            bundle.putString(bundleKey, ((CharSequence) o).toString());
+                        }
+                    }
+                }
+                else {
+                    // Key is for a sub bundle
+                    String subBundleKey = StringUtils.substringBefore(bundleKey, SAVED_PREFS_BUNDLE_KEY_SEPARATOR);
+                    subBundleKeys.add(subBundleKey);
+                }
+            }
+            else {
+                // Key is not related to this bundle.
+            }
+        }
+
+        // Recursively process the sub-bundles
+        for (String subBundleKey : subBundleKeys) {
+            Bundle subBundle = loadPreferencesBundle(sharedPreferences, prefKeyPrefix + subBundleKey);
+            bundle.putBundle(subBundleKey, subBundle);
+        }
+
+
+        if (wasDataThere) return bundle;
+        else return null;
+    }
+
 }
