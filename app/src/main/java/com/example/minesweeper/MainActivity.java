@@ -41,25 +41,25 @@ public class MainActivity extends AppCompatActivity {
 
     private final int mEMPTY_SPACE = R.drawable.empty, mINVALID_ICON_VALUE_FLAG = -99;
 
-    private final int BEGINNER_BOARD_SPACES = 100;
-    private final int INTERMEDIATE_BOARD_SPACES = 256;
-    private final int EXPERT_BOARD_SPACES = 400;
+    //private final int BEGINNER_BOARD_SPACES = 100;
+    //private final int INTERMEDIATE_BOARD_SPACES = 256;
+    //private final int EXPERT_BOARD_SPACES = 400;
 
-    private final int BEGINNER_BOARD_X = 10;
-    private final int BEGINNER_BOARD_Y = 30;
+    private final int BEGINNER_BOARD_X = 5;//number of rows
+    private final int BEGINNER_BOARD_Y = 5;//number of cols
 
-    private final int INTERMEDIATE_BOARD_X = 30;
+    private final int INTERMEDIATE_BOARD_X = 10;
     private final int INTERMEDIATE_BOARD_Y = 10;
 
-    private final int EXPERT_BOARD_X = 10;
-    private final int EXPERT_BOARD_Y = 10;
+    private final int EXPERT_BOARD_X = 15;
+    private final int EXPERT_BOARD_Y = 15;
 
 
     private final int BEGINNER_BOMB_PCT = 15;
     private final int INTERMEDIATE_BOMB_PCT = 16;
     private final int EXPERT_BOMB_PCT = 19;
 
-    private int getPreferedLevel = INTERMEDIATE_BOARD_SPACES;
+    //private int getPreferedLevel = INTERMEDIATE_BOARD_SPACES;
     private int getPreferedLevelX = INTERMEDIATE_BOARD_X;
     private int getPreferedLevelY = INTERMEDIATE_BOARD_Y;
     private int getPreferedPCT = INTERMEDIATE_BOMB_PCT;
@@ -190,7 +190,7 @@ public class MainActivity extends AppCompatActivity {
     private void createUnfilledBoard() {
 
         // Create the adapter for later use in the RecyclerView
-        mAdapter = new CardViewImageAdapter(getApplicationContext(), getPreferedLevelX, getPreferedLevelY,getPreferedPCT,R.drawable.empty, getPreferedScale);
+        mAdapter = new CardViewImageAdapter(getApplicationContext(), getPreferedLevelX, getPreferedLevelY,getPreferedPCT,R.drawable.empty, getPreferedScale,this);
 
         // set the listener which will listen to the clicks in the RecyclerView
         //mAdapter.setOnItemClickAndLongClickListener(listener);
@@ -620,11 +620,13 @@ public class MainActivity extends AppCompatActivity {
         startNewOrResumeGameState();
     }
 
-    private void doGameOverTasks() {
+    public void doGameOverTasks() {
         mGameOver = true;
     }
 
-    private void showGameOverSB(boolean gameAlreadyOver) {
+
+
+    public void showGameOverSB(boolean gameAlreadyOver) {
         StringBuilder sbText = generateGameOverMessage(gameAlreadyOver);
         mSbGame = Snackbar.make(mSbParentView, sbText, Snackbar.LENGTH_INDEFINITE);
         mSbGame.setAction(R.string.action_newGame, new View.OnClickListener() {

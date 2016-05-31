@@ -20,6 +20,8 @@ import java.util.Random;
 public class CardViewImageAdapter extends RecyclerView.Adapter<CardViewImageAdapter.ViewHolder>
 {
     private static final int HARDCODED_HEIGHT = 100;
+    private MainActivity maRef;
+    private View mSbParentView;
     //private static OIClickAndLongClickListener sOIClickAndLongClickListener;
     private clickHandler sClickHandler = new clickHandler();
 
@@ -46,7 +48,7 @@ public class CardViewImageAdapter extends RecyclerView.Adapter<CardViewImageAdap
     private final boolean gameOverOnMineExplode = true;
 
 
-    public CardViewImageAdapter (Context context, int rows,int cols, int minePercentage, int defaultDrawableID, double scaleVertical)
+    public CardViewImageAdapter (Context context, int rows,int cols, int minePercentage, int defaultDrawableID, double scaleVertical, MainActivity maRef)
     {
         this.rows = rows;
         this.cols = cols;
@@ -69,6 +71,8 @@ public class CardViewImageAdapter extends RecyclerView.Adapter<CardViewImageAdap
 
         fillMemberArrays(defaultDrawableID);
 
+        //this.mSbParentView=mSbParentView;
+        this.maRef=maRef;
 
     }
 
@@ -363,6 +367,8 @@ public class CardViewImageAdapter extends RecyclerView.Adapter<CardViewImageAdap
     private void failGame() {
         showAllBombs();
         disableClicks();
+        maRef.showGameOverSB(false);
+        maRef.doGameOverTasks();
 
     }
 
