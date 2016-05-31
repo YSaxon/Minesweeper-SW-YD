@@ -115,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
         Boolean dataFromAutoSave=false;
         if(savedInstanceState==null){
             Bundle prefData=restoreAllDataFromPrefs();
-            if(prefData!=null && prefData.containsKey("boolean>mines")){//test for a sample of data in prefs that would be there if was autosaved
+            if(prefData!=null && mPrefUseAutoSave && prefData.containsKey("boolean>mines")){//last one is a test for a sample of data in prefs that would be there if was autosaved
                 savedInstanceState=prefData;
                 dataFromAutoSave=true;
             }}
@@ -134,6 +134,7 @@ public class MainActivity extends AppCompatActivity {
         // If we are starting a fresh Activity (meaning, not after rotation), then do initial setup
         if (savedInstanceState == null) {
             setupInitialSession();
+
         }
         // If we're in the middle of a game then onRestoreInstanceState will restore the App's state
         if(dataFromAutoSave){
@@ -170,6 +171,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void prepareForNewGame() {
+        mGameOver=false;//maybe this will work...
         createUnfilledBoard();
         resetCurrentAndPriorPositions();
         dismissSnackBarIfShown();
@@ -264,6 +266,7 @@ public class MainActivity extends AppCompatActivity {
 
         // restore "game-over" state
         mGameOver = preferences.getBoolean(mKEY_GAME_OVER, false);
+        //if (!mGameOver){dismissSnackBarIfShown();}// if it works: a faster way to fix the bug I'm seeing}
 
         return restoreAllBoardData(preferences);
         }
@@ -326,6 +329,7 @@ public class MainActivity extends AppCompatActivity {
 
         // restore game over
         mGameOver = savedInstanceState.getBoolean(mKEY_GAME_OVER);
+        System.out.println(mGameOver);
 
         // have mAdapter restore its old state
         mAdapter.restoreSerializedData(savedInstanceState);
