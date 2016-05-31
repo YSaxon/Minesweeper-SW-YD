@@ -148,16 +148,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initGUI() {
-        initializeStatusItems();
         initializeSwipeRefreshLayout();
     }
 
     /**
      * Initializes the members that are relevant to only portrait or landscape
      */
-    private void initializeStatusItems() {
-        mStatusBar = (TextView) findViewById(R.id.textViewStatusBar);
-    }
 
     private void initializeSwipeRefreshLayout() {
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh);

@@ -14,12 +14,5 @@
         android:layout_centerHorizontal="true"
         android:layout_margin="@dimen/outside_margin" />
 
-    <include
-        layout="@layout/main_include_bottom_bar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/card_board"
-        android:layout_alignParentBottom="true" />
-
 
 </RelativeLayout>
