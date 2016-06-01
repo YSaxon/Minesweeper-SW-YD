@@ -11,12 +11,24 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
+
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".InstructionsActivity"
+            android:label="@string/title_activity_results"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/AppThemeMinWidth">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.sruly.tipcalculator.MainActivity"/>
+        </activity>
+
     </application>
 
 </manifest>

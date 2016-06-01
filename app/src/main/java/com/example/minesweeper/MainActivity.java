@@ -1,6 +1,7 @@
 package com.example.minesweeper;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
@@ -19,22 +20,17 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.TextView;
-import org.apache.commons.lang3.StringUtils;
-import org.json.JSONArray;
-import org.json.JSONException;
+
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.Serializable;
-import java.lang.reflect.Array;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
@@ -73,7 +69,6 @@ public class MainActivity extends AppCompatActivity {
     private final double EXPERT_SCALE_L = 6;
 
 
-
     private double getPreferedScale = INTERMEDIATE_SCALE_P;
 
     //private final int
@@ -91,10 +86,8 @@ public class MainActivity extends AppCompatActivity {
     private final String mPREFS = "PREFS";
 
 
-
     private CardViewImageAdapter mAdapter;
 
-    private TextView mStatusBar;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private Snackbar mSbGame;
     private View mSbParentView;
@@ -112,14 +105,15 @@ public class MainActivity extends AppCompatActivity {
 
         initGUI();
 
-        Boolean dataFromAutoSave=false;
-        if(savedInstanceState==null){
-            Bundle prefData=restoreAllDataFromPrefs();
-            if(prefData!=null && mPrefUseAutoSave && prefData.containsKey("boolean>mines")){//last one is a test for a sample of data in prefs that would be there if was autosaved
-                savedInstanceState=prefData;
-                dataFromAutoSave=true;
-            }}
-        if (savedInstanceState!=null){
+        Boolean dataFromAutoSave = false;
+        if (savedInstanceState == null) {
+            Bundle prefData = restoreAllDataFromPrefs();
+            if (prefData != null && mPrefUseAutoSave && prefData.containsKey("boolean>mines")) {//last one is a test for a sample of data in prefs that would be there if was autosaved
+                savedInstanceState = prefData;
+                dataFromAutoSave = true;
+            }
+        }
+        if (savedInstanceState != null) {
             getPreferedLevelX = savedInstanceState.getInt("rows");
             getPreferedLevelY = savedInstanceState.getInt("cols");
             getPreferedScale = savedInstanceState.getDouble("SCALEP");
@@ -130,14 +124,13 @@ public class MainActivity extends AppCompatActivity {
         initializeSnackBar();
 
 
-
         // If we are starting a fresh Activity (meaning, not after rotation), then do initial setup
         if (savedInstanceState == null) {
             setupInitialSession();
 
         }
         // If we're in the middle of a game then onRestoreInstanceState will restore the App's state
-        if(dataFromAutoSave){
+        if (dataFromAutoSave) {
             onRestoreInstanceState(savedInstanceState);
             //mAdapter.restoreSerializedData(savedInstanceState);
         }
@@ -167,7 +160,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void prepareForNewGame() {
-        mGameOver=false;//maybe this will work...
+        mGameOver = false;//maybe this will work...
         createUnfilledBoard();
         resetCurrentAndPriorPositions();
         dismissSnackBarIfShown();
@@ -188,7 +181,7 @@ public class MainActivity extends AppCompatActivity {
     private void createUnfilledBoard() {
 
         // Create the adapter for later use in the RecyclerView
-        mAdapter = new CardViewImageAdapter(getApplicationContext(), getPreferedLevelX, getPreferedLevelY,getPreferedPCT,R.drawable.empty, getPreferedScale,this);
+        mAdapter = new CardViewImageAdapter(getApplicationContext(), getPreferedLevelX, getPreferedLevelY, getPreferedPCT, R.drawable.empty, getPreferedScale, this);
 
         // set the listener which will listen to the clicks in the RecyclerView
         //mAdapter.setOnItemClickAndLongClickListener(listener);
@@ -221,7 +214,7 @@ public class MainActivity extends AppCompatActivity {
     /**
      * Called from onCreate() only if the user just entered the app from the home screen
      * as opposed to when destroying/recreating from e.g. an orientation change
-     * <p/>
+     * <p>
      * Steps:
      * 1. In case this is the first run ever, set the default values in shared prefs
      * 2. Then, set the last Game results message to first game of session
@@ -258,13 +251,13 @@ public class MainActivity extends AppCompatActivity {
     private Bundle restoreLastStateIfAutoSaveIsOn() {
         SharedPreferences preferences = getSharedPreferences(mPREFS, MODE_PRIVATE);
 
-         if (mPrefUseAutoSave) {
+        if (mPrefUseAutoSave) {
 
-        // restore "game-over" state
-        mGameOver = preferences.getBoolean(mKEY_GAME_OVER, false);
-        //if (!mGameOver){dismissSnackBarIfShown();}// if it works: a faster way to fix the bug I'm seeing}
+            // restore "game-over" state
+            mGameOver = preferences.getBoolean(mKEY_GAME_OVER, false);
+            //if (!mGameOver){dismissSnackBarIfShown();}// if it works: a faster way to fix the bug I'm seeing}
 
-        return restoreAllBoardData(preferences);
+            return restoreAllBoardData(preferences);
         }
         return null;//if not autosave
     }
@@ -276,8 +269,7 @@ public class MainActivity extends AppCompatActivity {
         // restore the board from SharedPreferences
         //restoreBoard(preferences);
 
-        return loadPreferencesBundle(preferences,"bundle");
-
+        return loadPreferencesBundle(preferences, "bundle");
 
 
     }
@@ -299,7 +291,7 @@ public class MainActivity extends AppCompatActivity {
         // save the current autoSave boolean
         outState.putBoolean(mKEY_USE_AUTO_SAVE, mPrefUseAutoSave);
 
-        outState.putDouble("SCALEP",getPreferedScale);
+        outState.putDouble("SCALEP", getPreferedScale);
         /*
         // save the board layout as a whole to the bundle to be saved
         outState.putIntArray(mKEY_BOARD, mAdapter.getDataOfModel());
@@ -333,7 +325,6 @@ public class MainActivity extends AppCompatActivity {
         // show game over message if the current saved game had already ended
         showGameOverSnackBarIfGameOver();
     }
-
 
 
     private void showGameOverSnackBarIfGameOver() {
@@ -393,7 +384,7 @@ public class MainActivity extends AppCompatActivity {
 
         Bundle bundle = new Bundle();
         onSaveInstanceState(bundle);
-        savePreferencesBundle(editor,"bundle",bundle);
+        savePreferencesBundle(editor, "bundle", bundle);
         editor.commit();
         //Bundle mbundle= mAdapter.getCardViewDataSerialized();
         //savePreferencesBundle(editor,"bundle2",mbundle);
@@ -502,17 +493,17 @@ public class MainActivity extends AppCompatActivity {
             }
 
             case R.id.action_newBeginnerGame: {
-                createNewGame(BEGINNER_BOARD_X,BEGINNER_BOARD_Y, BEGINNER_SCALE_P, BEGINNER_SCALE_L, BEGINNER_BOMB_PCT);//still needs to be adapted
+                createNewGame(BEGINNER_BOARD_X, BEGINNER_BOARD_Y, BEGINNER_SCALE_P, BEGINNER_SCALE_L, BEGINNER_BOMB_PCT);//still needs to be adapted
                 return true;
             }
 
             case R.id.action_newIntermediateGame: {
-                createNewGame(INTERMEDIATE_BOARD_X,INTERMEDIATE_BOARD_Y, INTERMEDIATE_SCALE_P, INTERMEDIATE_SCALE_L, INTERMEDIATE_BOMB_PCT);
+                createNewGame(INTERMEDIATE_BOARD_X, INTERMEDIATE_BOARD_Y, INTERMEDIATE_SCALE_P, INTERMEDIATE_SCALE_L, INTERMEDIATE_BOMB_PCT);
                 return true;
             }
 
             case R.id.action_newExpertGame: {
-                createNewGame(EXPERT_BOARD_X,EXPERT_BOARD_Y, EXPERT_SCALE_P, EXPERT_SCALE_L, EXPERT_BOMB_PCT);
+                createNewGame(EXPERT_BOARD_X, EXPERT_BOARD_Y, EXPERT_SCALE_P, EXPERT_SCALE_L, EXPERT_BOMB_PCT);
                 return true;
             }
 
@@ -521,14 +512,25 @@ public class MainActivity extends AppCompatActivity {
                 mPrefUseAutoSave = item.isChecked();
                 return true;
             }
+
             case R.id.action_about: {
                 showTTTDialog(getString(R.string.aboutDialogTitle),
                         getString(R.string.aboutDialog_banner)
                 );
                 return true;
             }
+
+            case R.id.action_how_to_play: {
+                showHowToPlay();
+                return true;
+            }
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void showHowToPlay() {
+        Intent intent = new Intent(getApplicationContext(), InstructionsActivity.class);
+        startActivity(intent);
     }
 
     private void createNewGame(int boardX, int boardY, double scaleP, double scaleL, int bombPCT) {//still needs to be adapted
@@ -538,7 +540,7 @@ public class MainActivity extends AppCompatActivity {
                 == Configuration.ORIENTATION_PORTRAIT
                 ? scaleP
                 : scaleL;
-        Log.d("SCALING", "The dimens are " + getPreferedLevelX + ","+ getPreferedLevelY);
+        Log.d("SCALING", "The dimens are " + getPreferedLevelX + "," + getPreferedLevelY);
         Log.d("SCALING", "The orientation is " + ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         //totalBombs = bombPCT;
         startNewGameIncludingSRAnimation();
@@ -623,7 +625,6 @@ public class MainActivity extends AppCompatActivity {
     public void doGameOverTasks() {
         mGameOver = true;
     }
-
 
 
     public void showGameOverSB(boolean gameAlreadyOver) {
@@ -738,17 +739,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
     private static final String SAVED_PREFS_BUNDLE_KEY_SEPARATOR = "§§";
 
     /**
      * Save a Bundle object to SharedPreferences.
-     *
+     * <p>
      * NOTE: The editor must be writable, and this function does not commit.
      *
-     * @param editor SharedPreferences Editor
-     * @param key SharedPreferences key under which to store the bundle data. Note this key must
-     *            not contain '§§' as it's used as a delimiter
+     * @param editor      SharedPreferences Editor
+     * @param key         SharedPreferences key under which to store the bundle data. Note this key must
+     *                    not contain '§§' as it's used as a delimiter
      * @param preferences Bundled preferences
      */
     public static void savePreferencesBundle(SharedPreferences.Editor editor, String key, Bundle preferences) {
@@ -756,27 +756,27 @@ public class MainActivity extends AppCompatActivity {
         Iterator<String> it = keySet.iterator();
         String prefKeyPrefix = key + SAVED_PREFS_BUNDLE_KEY_SEPARATOR;
 
-        while (it.hasNext()){
+        while (it.hasNext()) {
             String bundleKey = it.next();
             Object o = preferences.get(bundleKey);
-            if (o == null){
+            if (o == null) {
                 editor.remove(prefKeyPrefix + bundleKey);
-            } else if (o instanceof Integer){
+            } else if (o instanceof Integer) {
                 editor.putInt(prefKeyPrefix + bundleKey, (Integer) o);
-            } else if (o instanceof Long){
+            } else if (o instanceof Long) {
                 editor.putLong(prefKeyPrefix + bundleKey, (Long) o);
-            } else if (o instanceof Double){
+            } else if (o instanceof Double) {
                 editor.putLong(prefKeyPrefix + bundleKey, ((Double) o).longValue());
-            } else if (o instanceof Boolean){
+            } else if (o instanceof Boolean) {
                 editor.putBoolean(prefKeyPrefix + bundleKey, (Boolean) o);
-            } else if (o instanceof CharSequence){
+            } else if (o instanceof CharSequence) {
                 editor.putString(prefKeyPrefix + bundleKey, ((CharSequence) o).toString());
-            } else if (o instanceof Bundle){
+            } else if (o instanceof Bundle) {
                 savePreferencesBundle(editor, prefKeyPrefix + bundleKey, ((Bundle) o));
-            } else if (o instanceof Object[] || o.getClass().isArray()){
+            } else if (o instanceof Object[] || o.getClass().isArray()) {
                 Gson gson = new Gson();
                 String string = gson.toJson(o);
-                editor.putString(prefKeyPrefix + bundleKey,string);
+                editor.putString(prefKeyPrefix + bundleKey, string);
 //                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
 //                    try {
 //                        JSONArray json = new JSONArray(o);
@@ -793,16 +793,16 @@ public class MainActivity extends AppCompatActivity {
     private static int[] toArray(String json, Gson parser) {
         return parser.fromJson(json, int[].class);
     }
+
     /**
      * Load a Bundle object from SharedPreferences.
      * (that was previously stored using savePreferencesBundle())
-     *
+     * <p>
      * NOTE: The editor must be writable, and this function does not commit.
      *
      * @param sharedPreferences SharedPreferences
-     * @param key SharedPreferences key under which to store the bundle data. Note this key must
-     *            not contain '§§' as it's used as a delimiter
-     *
+     * @param key               SharedPreferences key under which to store the bundle data. Note this key must
+     *                          not contain '§§' as it's used as a delimiter
      * @return bundle loaded from SharedPreferences
      */
     public static Bundle loadPreferencesBundle(SharedPreferences sharedPreferences, String key) {
@@ -813,7 +813,7 @@ public class MainActivity extends AppCompatActivity {
         Set<String> subBundleKeys = new HashSet<String>();
         boolean wasDataThere = false;
         while (it.hasNext()) {
-            wasDataThere=true;
+            wasDataThere = true;
             String prefKey = it.next();
 
             if (prefKey.startsWith(prefKeyPrefix)) {
@@ -835,33 +835,35 @@ public class MainActivity extends AppCompatActivity {
                         Gson gson = new Gson();
                         Type type = null;
 
-                        if (bundleKey.startsWith("int>")){
-                            type = new TypeToken<int[][]>() {}.getType();}
-                        else if (bundleKey.startsWith("boolean>")){
-                            type = new TypeToken<boolean[][]>() {}.getType();}
-                        else if (bundleKey.startsWith("char>")){
-                            type = new TypeToken<char[][]>() {}.getType();}
+                        if (bundleKey.startsWith("int>")) {
+                            type = new TypeToken<int[][]>() {
+                            }.getType();
+                        } else if (bundleKey.startsWith("boolean>")) {
+                            type = new TypeToken<boolean[][]>() {
+                            }.getType();
+                        } else if (bundleKey.startsWith("char>")) {
+                            type = new TypeToken<char[][]>() {
+                            }.getType();
+                        }
 //                        else if (bundleKey.startsWith("string>")){
 //                            type = new TypeToken<ArrayList<String>>() {}.getType();}*/
 //                        else if (bundleKey.contains(">")) {
 //                            type = new TypeToken<Object[][]>() {}.getType();
 //                        }
 
-                        if (type != null){//if was an array
+                        if (type != null) {//if was an array
                             Object serializable = gson.fromJson((String) o, type);
-                            bundle.putSerializable(bundleKey, (Serializable) serializable);}
-                        else{//actually a string
+                            bundle.putSerializable(bundleKey, (Serializable) serializable);
+                        } else {//actually a string
                             bundle.putString(bundleKey, ((CharSequence) o).toString());
                         }
                     }
-                }
-                else {
+                } else {
                     // Key is for a sub bundle
                     String subBundleKey = StringUtils.substringBefore(bundleKey, SAVED_PREFS_BUNDLE_KEY_SEPARATOR);
                     subBundleKeys.add(subBundleKey);
                 }
-            }
-            else {
+            } else {
                 // Key is not related to this bundle.
             }
         }
@@ -876,5 +878,5 @@ public class MainActivity extends AppCompatActivity {
         if (wasDataThere) return bundle;
         else return null;
     }
-
 }
+

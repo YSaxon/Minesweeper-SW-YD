@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="outside_margin">4dp</dimen>
-    <dimen name="fontSizeStatusBar">18sp</dimen>
     <dimen name="buttonTextSize">6sp</dimen>
+    <string name="help_text">HOW_TO_PLAY_INSTRUCTIONS_TODO</string>
+    <dimen name="help_text_size">12sp</dimen>
+    <dimen name="app_bar_height">10dp</dimen>
 </resources>

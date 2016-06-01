@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Notes:
+    xmlns entries are
+    NameSpaces that contain the various properties used in this file
+
+    Typically, all Views and ViewGroups such as Layouts, Buttons, et al.
+    have defined layout width and height properties like:
+        android:layout_width=
+            (either "match_parent" or "wrap_content" or a fixed amount in dp)
+        android:layout_height=
+            same choices as layout_width
+
+    The layout behavior is needed for specialized scrolling purposes
+    You can ignore this for now.
+
+    The two Tools entries indicate in which XML file this file will be used
+    In this case, it is activity_main, and the preview will reflect both XMLs.
+    -->
+
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:foregroundGravity="center_vertical"
+
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+
+    tools:context=".InstructionsActivity"
+    tools:showIn="@layout/activity_instructions">
+
+    <!-- This ImageView is used to optionally show a background image
+ We need an ID in order to get a handle to it in the Activity's Java code
+ -->
+        <ScrollView
+            android:id="@+id/scrollView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/activity_horizontal_margin"
+            >
+
+            <android.support.v7.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:alpha=".7"
+                app:cardElevation="@dimen/cardview_default_elevation"
+                >
+
+                <include layout="@layout/instructions_include_all_content"/>
+
+            </android.support.v7.widget.CardView>
+
+        </ScrollView>
+</android.support.design.widget.CoordinatorLayout>

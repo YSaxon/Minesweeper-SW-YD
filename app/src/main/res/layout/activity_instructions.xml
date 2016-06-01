@@ -1,0 +1,20 @@
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    tools:context=".InstructionsActivity">
+
+    <include layout="@layout/instructions_include_toolbar"/>
+
+    <include
+        layout="@layout/content_instructions"/>
+
+    <android.support.design.widget.FloatingActionButton
+        style="@style/FAB"
+        android:onClick="cmdOK"
+        android:src="@drawable/ic_arrow_back_white_24dp"
+        android:text="@string/OK"/>
+
+</android.support.design.widget.CoordinatorLayout>

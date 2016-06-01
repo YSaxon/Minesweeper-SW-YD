@@ -32,6 +32,12 @@
         app:showAsAction="never"/>
 
     <item
+        android:id="@+id/action_how_to_play"
+        android:title="@string/how_to_play_menu_item"
+        android:checkable="false"
+        app:showAsAction="never" />
+
+    <item
         android:id="@+id/action_about"
         android:icon="@drawable/ic_info_white_24dp"
         android:title="@string/about"

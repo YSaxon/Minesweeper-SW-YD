@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+<TableLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="match_parent"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    tools:showIn="@layout/content_instructions">
+
+    <TableRow android:gravity="start">
+        <TextView
+            style="@style/fieldsTextView.instructionsHeader"
+            android:layout_span="2"
+            android:text="@string/objective"/>
+    </TableRow>
+
+    <TableRow android:gravity="center">
+        <TextView
+            style="@style/fieldsTextView.subText"
+            android:text="Remove all bombs without blowing up!"
+            android:layout_span="3"/>
+    </TableRow>
+
+    <TableRow android:gravity="start">
+        <TextView
+            style="@style/fieldsTextView.subText"/>
+    </TableRow>
+
+    <TableRow android:gravity="start">
+        <TextView
+            style="@style/fieldsTextView.instructionsHeader"
+            android:layout_span="2"
+            android:text="@string/start"/>
+    </TableRow>
+
+    <TableRow android:gravity="center">
+        <TextView
+            style="@style/fieldsTextView.subText"
+            android:text="@string/instructions_Start"
+            android:layout_span="3"/>
+    </TableRow>
+
+    <TableRow android:gravity="start">
+        <TextView
+            style="@style/fieldsTextView.subText"/>
+    </TableRow>
+
+    <TableRow android:gravity="start">
+        <TextView
+            style="@style/fieldsTextView.instructionsHeader"
+            android:layout_span="2"
+            android:text="@string/gamePlay"/>
+    </TableRow>
+
+    <TableRow android:gravity="center">
+        <TextView
+            style="@style/fieldsTextView.subText"
+            android:text="@string/instructions_gamePlay"
+            android:layout_span="3"/>
+    </TableRow>
+
+
+    <TableRow android:gravity="start">
+        <TextView
+            style="@style/fieldsTextView.subText"/>
+    </TableRow>
+
+    <TableRow android:gravity="start">
+        <TextView
+            style="@style/fieldsTextView.instructionsHeader"
+            android:layout_span="2"
+            android:text="@string/winning"/>
+    </TableRow>
+
+    <TableRow android:gravity="center">
+        <TextView
+            style="@style/fieldsTextView.subText"
+            android:text="@string/instructions_winning"
+            android:layout_span="3"/>
+    </TableRow>
+
+    <TableRow android:gravity="start">
+        <TextView
+            style="@style/fieldsTextView.subText"/>
+    </TableRow>    <TableRow android:gravity="center">
+
+        <TextView
+            style="@style/fieldsTextView.instructionsHeader"
+            android:text="@string/padding"/>
+
+    </TableRow>
+
+
+
+</TableLayout>

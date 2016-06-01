@@ -20,7 +20,7 @@
     <!--  Preference Key  -->
     <string name="key_use_auto_save">USE_AUTO_SAVE</string>
     <string name="title_use_auto_save">Use Auto-Save</string>
-    <string name="title_activity_settings">Settings</string>
+    <string name="title_activity_how_to_play">How to Play</string>
 
     <!-- Example General settings -->
     <string name="pref_header_general">General</string>
@@ -76,4 +76,20 @@
 
     <string name="pref_title_vibrate">Vibrate</string>
     <string name="board_space">Board Space</string>
+    <string name="help_text">Instructions:
+
+        Objective: Clear the entire mine field of bombs.
+
+        </string>
+    <string name="how_to_play_menu_item">How to Play</string>
+    <string name="aboutDialog_title">About</string>
+    <string name="objective">Objective:</string>
+    <string name="padding">---------------------------------------------------------------</string>
+    <string name="title_activity_results">Instructions</string>
+    <string name="start">Start:</string>
+    <string name="gamePlay">Game Play:</string>
+    <string name="instructions_gamePlay">Each field has 8 fields which surround it (excluding corners). The number reveals how many of those fields contain bombs.</string>
+    <string name="instructions_Start">Click a random field and hope you don\'t hit a bomb! (HINT: Sides and corners are less likely to be a bomb.</string>
+    <string name="winning">How to Win:</string>
+    <string name="instructions_winning">If you think a field holds a bomb, simply flag it by long clicking. When you flag all the bombs, you win!</string>
 </resources>
